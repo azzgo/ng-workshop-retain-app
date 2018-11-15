@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { isEmpty } from 'lodash';
 
 @Component({
@@ -6,14 +6,15 @@ import { isEmpty } from 'lodash';
   templateUrl: './note-creator.component.html',
   styleUrls: ['./note-creator.component.css']
 })
-export class NoteCreatorComponent {
+export class NoteCreatorComponent implements OnInit {
   isFocus = false;
-  note = {
-    title: '',
-    value: ''
-  };
+  note;
 
   @Output() newNote = new EventEmitter();
+
+  ngOnInit() {
+    this.resetForm();
+  }
 
   createNote() {
     const { title, value } = this.note;
@@ -21,8 +22,16 @@ export class NoteCreatorComponent {
       return false;
     }
 
-    this.newNote.next({title, value});
+    this.newNote.emit({title, value});
+    this.resetForm();
     return false;
+  }
+
+  resetForm() {
+    this.note = {
+      title: '',
+      value: '',
+    };
   }
 
 }

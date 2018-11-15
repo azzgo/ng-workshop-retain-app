@@ -1,27 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { NotesService, INote } from '../../services/notes.service';
 
 @Component({
   selector: 'rt-notes',
   templateUrl: './notes.component.html',
   styleUrls: ['./notes.component.css']
 })
-export class NotesComponent {
-  notes = [
-    {
-      title: 'n',
-      value: 'v'
-    }, {
-      title: 'n1',
-      value: 'v1'
-    }
-  ];
+export class NotesComponent implements OnInit {
+  notes: INote[] = [];
 
-  checkCard(note, i) {
-    this.notes.splice(i, 1);
+  constructor(private notesService: NotesService) {}
+
+  ngOnInit() {
+    this.fetchNotes();
   }
 
-  addNote(note) {
-    this.notes.push(note);
+  fetchNotes() {
+    this.notesService.getNotes().subscribe(notes => this.notes = notes);
+  }
+
+  checkCard(objectId) {
+    const index = this.notes.findIndex(note => note.objectId === objectId);
+    this.notesService.completeNote(objectId).subscribe(() => this.fetchNotes());
+  }
+
+  addNote(note: INote) {
+    this.notesService.createNote(note).subscribe(({objectId}) => {
+      this.notes.push({
+        ...note,
+        objectId
+      });
+    });
   }
 
 }
